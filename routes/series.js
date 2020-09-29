@@ -1,12 +1,15 @@
 var express = require('express');
 var router = express.Router();
+const Label = require('./label.js');
 
 function fetchSeriesInitials() {
   return [
     {
       initial: 'S',
       labels: [
-        'san', 'sum', 'syo'
+        new Label('san'),
+        new Label('sum'),
+        new Label('syo'),
       ],
     },
   ];
@@ -14,9 +17,9 @@ function fetchSeriesInitials() {
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('series', {
+  res.render('labels', {
     title: '作品一覧',
-    seriesInitials: fetchSeriesInitials(),
+    blockInitials: fetchSeriesInitials(),
   });
 });
 

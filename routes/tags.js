@@ -1,12 +1,15 @@
 var express = require('express');
 var router = express.Router();
+const Label = require('./label.js');
 
 function fetchTagInitials() {
   return [
     {
       initial: 'A',
       labels: [
-        'allow', 'and', 'array'
+        new Label('allow'),
+        new Label('and'),
+        new Label('array'),
       ],
     },
   ];
@@ -14,9 +17,9 @@ function fetchTagInitials() {
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('tags', {
+  res.render('labels', {
     title: 'タグ一覧',
-    tagInitials: fetchTagInitials(),
+    blockInitials: fetchTagInitials(),
   });
 });
 
