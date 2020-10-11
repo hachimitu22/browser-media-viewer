@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+  </head>
+  <body>
+    <h1><%= title %></h1>
+    <p>Welcome to <%= title %></p>
+    <%- include('partials/header'); %>
+    <div>
+      <form method="POST">
+        <input placeholder="タイトル" type="text" name="title">
+        <input placeholder="タイトル読み" type="text" name="title_en">
+        <input placeholder="シリーズ" type="text" name="series">
+        <input placeholder="シリーズ読み" type="text" name="series_en">
+        <input placeholder="作者" type="text"name="author">><input placeholder="作者読み" type="text" name="author_en"><p>+</p>
+        <input placeholder="キャラ名" type="text" name="character"><input placeholder="キャラ名読み" type="text" name="character_en"><p>+</p>
+        <input placeholder="タグ名" type="text" name="tag"><input placeholder="タグ名読み" type="text" name="tag_en"><p>+</p>
+        <input type="submit">
+      </form>
+    </div>
+  </body>
+</html>

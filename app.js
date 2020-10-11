@@ -3,6 +3,15 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+const mysql = require('mysql');
+
+const connection = mysql.createConnection({
+  host: 'localhost',
+  user: 'root',
+  password: 's2727mitu1212mitus',
+  database: 'media_viewer',
+});
+connection.connect();
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -10,6 +19,7 @@ var tagsRouter = require('./routes/tags');
 var charactersRouter = require('./routes/characters');
 var authorsRouter = require('./routes/authors');
 var seriesRouter = require('./routes/series');
+var uploadRouter = require('./routes/upload');
 
 var app = express();
 
@@ -29,6 +39,7 @@ app.use('/tags', tagsRouter);
 app.use('/characters', charactersRouter);
 app.use('/authors', authorsRouter);
 app.use('/series', seriesRouter);
+app.use('/upload', uploadRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
