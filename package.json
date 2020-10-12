@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www"
+    "start": "node ./bin/www root s2727mitu1212mitus media_viewer"
   },
   "dependencies": {
     "cookie-parser": "^1.4.4",

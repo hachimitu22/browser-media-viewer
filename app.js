@@ -3,15 +3,6 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-const mysql = require('mysql');
-
-const connection = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: 's2727mitu1212mitus',
-  database: 'media_viewer',
-});
-connection.connect();
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');

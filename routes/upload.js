@@ -1,14 +1,7 @@
 var express = require('express');
 var router = express.Router();
 const Label = require('./label.js');
-const mysql = require('mysql');
-
-const connection = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: 's2727mitu1212mitus',
-  database: 'media_viewer',
-});
+const connection = require('./database');
 
 function fetchAuthorsInitials() {
   return [
