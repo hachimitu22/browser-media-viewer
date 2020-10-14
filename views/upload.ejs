@@ -12,13 +12,60 @@
       <form method="POST">
         <input placeholder="タイトル" type="text" name="title">
         <input placeholder="タイトル読み" type="text" name="title_en">
-        <input placeholder="シリーズ" type="text" name="series">
-        <input placeholder="シリーズ読み" type="text" name="series_en">
-        <input placeholder="作者" type="text"name="author">><input placeholder="作者読み" type="text" name="author_en"><p>+</p>
-        <input placeholder="キャラ名" type="text" name="character"><input placeholder="キャラ名読み" type="text" name="character_en"><p>+</p>
-        <input placeholder="タグ名" type="text" name="tag"><input placeholder="タグ名読み" type="text" name="tag_en"><p>+</p>
+        <% categories.forEach(function(category){ %>
+          <div id="<%= category.name %>">
+            <div id="<%= category.name %>-group">
+              <div id="<%= category.name %>-area-1">
+                <input placeholder="<%= category.placeholder %>" type="text" name="<%= category.name %>_1">
+                <input placeholder="<%= category.placeholder %>読み" type="text" name="<%= category.name %>_en_1">
+                <span onclick="removeLabelArea(this)" hidden>-</span>
+              </div>
+            </div>
+            <span onclick="appendLabelArea(this)">+</span><br>
+          </div>
+        <% }); %>
         <input type="submit">
       </form>
     </div>
+    <script type="text/javascript">
+      function appendLabelArea(element) {
+        const category = element.parentElement;
+        const group = category.querySelector('div');
+        const area = group.querySelector('div');
+        const areaClone = area.cloneNode(true);
+        group.appendChild(areaClone);
+
+        const areas = Array.from(group.getElementsByTagName('div'));
+        areas.forEach(area => {
+          area.querySelector('span').hidden = false;
+        });
+
+        renumberGroup(group);
+      }
+      function removeLabelArea(element) {
+        const area = element.parentElement;
+        const group = area.parentElement
+        group.removeChild(area);
+        renumberGroup(group);
+
+        const areas = Array.from(group.getElementsByTagName('div'));
+        if(areas.length === 1){
+          areas[0].querySelector('span').hidden = true;
+        }
+      }
+      function renumberGroup(groupElement){
+        const areas = Array.from(groupElement.getElementsByTagName('div'));
+
+        areas.forEach((area, i) => {
+          const number = i + 1;
+          area.id = area.id.replace(/\d+$/, number);
+
+          const inputs = Array.from(area.getElementsByTagName('input'));
+          inputs.forEach(input => {
+            input.name = input.name.replace(/\d+$/, number);
+          });
+        });
+      }
+    </script>
   </body>
 </html>

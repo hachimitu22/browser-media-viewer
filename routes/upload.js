@@ -19,7 +19,13 @@ function fetchAuthorsInitials() {
 /* GET home page. */
 router.get('/', function(req, res, next) {
   res.render('upload', {
-    title: 'アップロード'
+    title: 'アップロード',
+    categories: [
+      { name: 'series', placeholder: 'シリーズ' },
+      { name: 'author', placeholder: '作者' },
+      { name: 'character', placeholder: 'キャラクター' },
+      { name: 'tag', placeholder: 'タグ' }
+    ],
   });
 });
 
