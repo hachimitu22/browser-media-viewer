@@ -4,18 +4,6 @@ const Label = require('./label.js');
 const connection = require('./database');
 const multer = require('multer');
 const path = require('path');
-const upload = multer({
-  dest: 'public/images/',
-  storage: multer.diskStorage({
-    destination: function (req, file, callback) {
-      callback(null, 'public/images/');
-    },
-    filename: function (req, file, callback) {
-      // console.log('filename:', file);
-      callback(null, file.originalname);
-    },
-  }),
-});
 
 function fetchAuthorsInitials() {
   return [
@@ -45,8 +33,30 @@ router.get('/', function(req, res, next) {
   });
 });
 
-router.post('/', upload.any(), function (req, res, next) {
+router.post('/', function (req, res, next) {
   console.log('files:', req.files);
+  console.log('body:', req.body);
+
+  const title = req.body.title;
+  const upload = multer({
+    // dest: `public/images/${title}/`,
+    storage: multer.diskStorage({
+      destination: function (req, file, callback) {
+        const title = req.body.title;
+        console.log('in body:', req.body);
+        // callback(null, `public/images/${title}/`);
+        callback(null, `public/images/`);
+      },
+      filename: function (req, file, callback) {
+        // console.log('filename:', file);
+        callback(null, file.originalname);
+      },
+    }),
+  }).any();
+
+  upload(req, res, function (err) {
+    console.log('upload err:', err);
+  });
 
   return;
 
