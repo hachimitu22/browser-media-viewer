@@ -9,7 +9,10 @@
     <p>Welcome to <%= title %></p>
     <%- include('partials/header'); %>
     <div>
-      <form method="POST">
+      <form method="POST" enctype="multipart/form-data">
+        <input type="file" accept="image/*" name="images" onchange="fileSelected(this)" multiple><br>
+        <div id="file-list"></div>
+
         <input placeholder="タイトル" type="text" name="title">
         <input placeholder="タイトル読み" type="text" name="title_en">
         <% categories.forEach(function(category){ %>
@@ -28,6 +31,34 @@
       </form>
     </div>
     <script type="text/javascript">
+      function fileSelected(element) {
+        const files = Array.from(element.files);
+
+        const ul = document.createElement('ul');
+        files.forEach(file => {
+          const li = document.createElement('li');
+          li.textContent = file.name;
+          ul.appendChild(li);
+        });
+        document.getElementById('file-list').appendChild(ul);
+      }
+      function showThumbnails(element) {
+        const files = Array.from(element.files).sort((a, b) => a.name.localeCompare(b.name));
+        const thumbnail = document.getElementById('file-list')
+
+        files.forEach(file => {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const img = document.createElement('img');
+            img.setAttribute('name', file.name);
+            img.setAttribute('src', e.target.result);
+            // img.setAttribute('width', '25%');
+            // img.setAttribute('height', '25%');
+            thumbnail.appendChild(img);
+          };
+          reader.readAsDataURL(file);
+        });
+      }
       function appendLabelArea(element) {
         const category = element.parentElement;
         const group = category.querySelector('div');
@@ -40,13 +71,13 @@
           area.querySelector('span').hidden = false;
         });
 
-        renumberGroup(group);
+        // renumberGroup(group);
       }
       function removeLabelArea(element) {
         const area = element.parentElement;
         const group = area.parentElement
         group.removeChild(area);
-        renumberGroup(group);
+        // renumberGroup(group);
 
         const areas = Array.from(group.getElementsByTagName('div'));
         if(areas.length === 1){

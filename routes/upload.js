@@ -2,6 +2,20 @@ var express = require('express');
 var router = express.Router();
 const Label = require('./label.js');
 const connection = require('./database');
+const multer = require('multer');
+const path = require('path');
+const upload = multer({
+  dest: 'public/images/',
+  storage: multer.diskStorage({
+    destination: function (req, file, callback) {
+      callback(null, 'public/images/');
+    },
+    filename: function (req, file, callback) {
+      // console.log('filename:', file);
+      callback(null, file.originalname);
+    },
+  }),
+});
 
 function fetchAuthorsInitials() {
   return [
@@ -18,6 +32,8 @@ function fetchAuthorsInitials() {
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
+  console.log(__dirname);
+
   res.render('upload', {
     title: 'アップロード',
     categories: [
@@ -29,21 +45,53 @@ router.get('/', function(req, res, next) {
   });
 });
 
-router.post('/', function (req, res, next) {
-  console.log(req.body);
+router.post('/', upload.any(), function (req, res, next) {
+  console.log('files:', req.files);
 
-  const title = req.body.title;
-  const title_en = req.body.title_en;
-  const query = `insert into manga (title, title_en) values ('${title}', '${title_en}');`;
+  return;
 
+  const query = `show table status like 'manga';`;
   connection.query(query).on('error', (err) => {
     console.log('err is: ', err);
   }).on('result', (rows) => {
     console.log('result: ', rows);
+    const id = rows.Auto_increment;
+    const title = req.body.title;
+    const title_en = req.body.title_en;
+    const images = req.body.images;
+    const queries = [
+      'delimiter //',
+      'create trigger trigger_name',
+      'begin',
+      `insert into manga (title, title_en) values ('${title}', '${title_en}');`,
+      `insert into image (manga_id, page_number, path) values ` + images.map((image, i) => {
+        const pageNumber = i + 1;
+        return `('${id}', '${pageNumber}', '${image}')`;
+      }).join(',\n') + ';',
+      `insert into tag (title, title_en) values ('${title}', '${title_en}');`,
+      `insert into manga_tag (title, title_en) values ('${title}', '${title_en}');`,
+      'end',
+      'delimiter ;',
+    ];
+    const query = queries.join('\n');
+
+    connection.query(query).on('error', (err) => {
+      console.log('err is: ', err);
+    }).on('result', (rows) => {
+      console.log('result: ', rows);
+
+      const images = [];
+      const path = `public/images/${title}`;
+      saveImages(path, images);
+
+    }).on('end', () => {
+      console.log('end');
+      res.redirect('/');
+    });
   }).on('end', () => {
-    console.log('end');
-    res.redirect('/');
+    // nop.
   });
+
 });
 
 module.exports = router;
