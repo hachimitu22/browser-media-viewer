@@ -4,6 +4,7 @@ const Label = require('./label.js');
 const connection = require('./database');
 const multer = require('multer');
 const path = require('path');
+const fs = require('fs');
 
 function fetchAuthorsInitials() {
   return [
@@ -33,75 +34,70 @@ router.get('/', function(req, res, next) {
   });
 });
 
-router.post('/', function (req, res, next) {
-  console.log('files:', req.files);
-  console.log('body:', req.body);
-
-  const title = req.body.title;
+function createUpload(mangaID) {
   const upload = multer({
-    // dest: `public/images/${title}/`,
     storage: multer.diskStorage({
       destination: function (req, file, callback) {
-        const title = req.body.title;
-        console.log('in body:', req.body);
-        // callback(null, `public/images/${title}/`);
-        callback(null, `public/images/`);
+        callback(null, `public/images/${mangaID}/`);
       },
       filename: function (req, file, callback) {
-        // console.log('filename:', file);
         callback(null, file.originalname);
       },
     }),
-  }).any();
+  }).array('images');
 
-  upload(req, res, function (err) {
-    console.log('upload err:', err);
-  });
+  return upload;
+}
 
-  return;
+router.post('/', function (req, res, next) {
+  // console.log('files:', req.files);
+  // console.log('body:', req.body);
 
-  const query = `show table status like 'manga';`;
-  connection.query(query).on('error', (err) => {
-    console.log('err is: ', err);
-  }).on('result', (rows) => {
-    console.log('result: ', rows);
-    const id = rows.Auto_increment;
-    const title = req.body.title;
-    const title_en = req.body.title_en;
-    const images = req.body.images;
-    const queries = [
-      'delimiter //',
-      'create trigger trigger_name',
-      'begin',
-      `insert into manga (title, title_en) values ('${title}', '${title_en}');`,
-      `insert into image (manga_id, page_number, path) values ` + images.map((image, i) => {
-        const pageNumber = i + 1;
-        return `('${id}', '${pageNumber}', '${image}')`;
-      }).join(',\n') + ';',
-      `insert into tag (title, title_en) values ('${title}', '${title_en}');`,
-      `insert into manga_tag (title, title_en) values ('${title}', '${title_en}');`,
-      'end',
-      'delimiter ;',
-    ];
-    const query = queries.join('\n');
+  connection.beginTransaction(err => {
+    if (err) throw err;
 
-    connection.query(query).on('error', (err) => {
-      console.log('err is: ', err);
-    }).on('result', (rows) => {
-      console.log('result: ', rows);
+    const query = `show table status like 'manga';`;
+    connection.query(query, (err, results) => {
+      if (err) return connection.rollback(() => { throw err; });
 
-      const images = [];
-      const path = `public/images/${title}`;
-      saveImages(path, images);
+      console.log('show:', results);
+      const id = results[0].Auto_increment + 1;
+      const upload = createUpload(id);
+      const path = `public/images/${id}/`;
 
-    }).on('end', () => {
-      console.log('end');
-      res.redirect('/');
+      if (!fs.existsSync(path)) {
+        fs.mkdirSync(path);
+      }
+
+      upload(req, res, function (err) {
+        if (err) return connection.rollback(() => { throw err; });
+
+        console.log('upload files:', req.files);
+        console.log('upload body:', req.body);
+        console.log('upload body title:', req.body.title);
+        console.log('upload err:', err);
+
+        const title = req.body.title;
+        const title_en = req.body.title_en;
+        const query = `insert into manga (title, title_en) values ('${title}', '${title_en}');`
+        connection.query(query, err => {
+          if (err) return connection.rollback(() => { throw err; });
+
+          const files = req.files;
+          const values = files.map((file, i) => `('${id}', '${i + 1}', '${file.originalname}')`);
+          const query = `insert into image (manga_id, page_number, path) values ${values.join(', ')};`;
+
+          connection.query(query, err => {
+            if (err) return connection.rollback(() => { throw err; });
+            connection.commit(err => {
+              if (err) return connection.rollback(() => { throw err; });
+              res.redirect('/');
+            });
+          });
+        });
+      });
     });
-  }).on('end', () => {
-    // nop.
   });
-
 });
 
 module.exports = router;
