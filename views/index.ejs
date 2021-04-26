@@ -11,5 +11,12 @@
     <% summaries.forEach(function(summary){ %>
       <%- include('partials/summary', summary); %>
     <% }); %>
+    <% for(let i = 1; i <= page.max; i++){ %>
+      <% if (i === page.current) { %>
+        <%= i %>
+      <% } else { %>
+        <a href="/?page=<%= i %>"><%= i %></a>
+      <% }; %>
+    <% }; %>
   </body>
 </html>

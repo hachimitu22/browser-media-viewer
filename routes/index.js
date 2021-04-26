@@ -37,6 +37,10 @@ router.get('/', function (req, res, next) {
   res.render('index', {
     title: 'Express',
     summaries: summaries.slice(index * 5, (index + 1) * 5),
+    page: {
+      current: page,
+      max: Math.ceil(summaries.length / 5),
+    },
   });
 });
 
