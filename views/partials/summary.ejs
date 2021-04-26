@@ -1,0 +1,28 @@
+<!-- 
+  {
+    manga : {
+      title,
+      id,
+    },
+    tags : [{ text }],
+    characters : [{ text }],
+    series : [{ text }],
+    authors : [{ text }],
+  }
+ -->
+<div>
+  <a href="/manga/<%= manga.id %>"><%= manga.title %></a>
+  <img src="<%= manga.thumbnail %>">
+  <% tags.forEach(function(tag){ %>
+    <a href="/?search=<%= tag.text %>"><%= tag.text %></a>
+  <% }); %>
+  <% characters.forEach(function(character){ %>
+    <a href="/?search=<%= character.text %>"><%= character.text %></a>
+  <% }); %>
+  <% series.forEach(function(series){ %>
+    <a href="/?search=<%= series.text %>"><%= series.text %></a>
+  <% }); %>
+  <% authors.forEach(function(author){ %>
+    <a href="/?search=<%= author.text %>"><%= author.text %></a>
+  <% }); %>
+</div>
